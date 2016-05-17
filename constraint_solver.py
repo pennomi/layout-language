@@ -2,6 +2,10 @@ from sympy import S, Symbol
 from sympy.solvers.solveset import linsolve
 
 
+class OverconstrainedError(Exception):
+    pass
+
+
 layout = [
     {
         "type": "Rect",
@@ -38,6 +42,7 @@ layout = [
                 "x": "rect2.x",
                 "y": "rect2.bottom",
                 "w": "rect2.w",
+                "h": "9000",
                 "bottom": "parent.bottom",
                 "color": (0, 0, 255, 255)
             }
@@ -82,7 +87,10 @@ def main():
     for eqn in equations:
         symbols = symbols.union(eqn.atoms(Symbol))
     symbols = list(symbols)
-    solve = list(linsolve(equations, *symbols))[0]
+    solved_equations = linsolve(equations, *symbols)
+    if not solved_equations:
+        raise OverconstrainedError("A solution could not be found.")
+    solve = list(solved_equations)[0]
     print(list(zip(symbols, solve)))
 
 
